@@ -103,7 +103,7 @@
   
   /* Reviews Section */
   .reviews-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:20px;margin-top:20px}
-  .review-card{background:#fff;border-radius:12px;padding:20px;box-shadow:var(--card-shadow);border-top:4px solid var(--tt-secondary);transition:transform 0.3s ease}
+  .review-card{background:#fff;border-radius:12px;padding:20px;box-shadow:var(--card-shadow);border-top:4px solid var(--tt-secondary);transition:transform 0.3s ease;animation:fadeInUp 0.5s ease}
   .review-card:hover{transform:translateY(-5px)}
   .review-card .stars{color:var(--tt-secondary);margin-bottom:10px;font-size:16px}
   .review-card p{font-size:14px;color:#555;margin-bottom:15px;line-height:1.5}
@@ -111,7 +111,11 @@
   .review-card .avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--tt-primary),var(--tt-secondary));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
   .review-card .reviewer-info strong{display:block;font-size:14px}
   .review-card .reviewer-info span{font-size:12px;color:#999}
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   
+  .see-more-btn{display:block;margin:25px auto 0;padding:12px 30px;background:linear-gradient(135deg,var(--tt-primary),var(--tt-secondary));color:#fff;border:none;border-radius:30px;font-weight:600;cursor:pointer;transition:all 0.3s ease;box-shadow:0 4px 15px rgba(209,0,0,0.3)}
+  .see-more-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(209,0,0,0.4)}
+
   /* Forms */
   form label{display:block;font-size:13px;font-weight:600;margin:10px 0 6px;color:#34495e}
   form input,form select,form textarea{width:100%;padding:11px 14px;border:2px solid #e8e8e8;border-radius:8px;font-size:14px;transition:all 0.3s ease;background:#fafbfc}
@@ -307,6 +311,9 @@
   <div class="card">
     <div class="section-title"><span class="icon">⭐</span> কাস্টমার রিভিউ (৩০ জনের)</div>
     <div id="reviewsGrid" class="reviews-grid"></div>
+    <div style="text-align:center;">
+      <button id="seeMoreBtn" class="see-more-btn" onclick="showMoreReviews()">⬇️ আরও রিভিউ দেখুন (See More)</button>
+    </div>
   </div>
 </main>
 
@@ -392,6 +399,7 @@ const ADMIN_PASSWORD = "admin123";
 const WA_NUMBER = "8801704131827"; 
 
 let allOutlets = [], renderedItems = [], currentBrand = "ALL", adminUnlocked = false, adminOutlets = [];
+let reviewsVisible = 10; // Initially show 10 reviews
 
 // ---------- 30 Reviews Data ----------
 const reviewsData = [
@@ -405,7 +413,7 @@ const reviewsData = [
   { name: "Tasnim Khan", branch: "Dhanmondi Branch", stars: 5, text: "Tasty Treat এর পেস্ট্রি আইটেমগুলো দারুণ। সকালের নাস্তার জন্য পারফেক্ট।" },
   { name: "Imran Kabir", branch: "Bashundhara Branch", stars: 5, text: "স্টাফদের আচরণ খুবই ভালো এবং পরিষ্কার পরিচ্ছন্ন পরিবেশ।" },
   { name: "Sumaiya Akter", branch: "Gulshan Branch", stars: 4, text: "ফাস্ট ফুড হিসেবে বেশ ভালো। তবে বসার জায়গা আরও বেশি হলে ভালো হয়।" },
-  { name: "Rifat Hossain", branch: "Mohammadpur Branch", stars: 5, text: "Fry Bucket এর ফ্রাই আর ময়নেজ মাস্টারপিস! প্রতিবার খেতে ইচ্ছা করে।" },
+  { name: "Rifat Hossain", branch: "Mohammadpur Branch", stars: 5, text: "Fry Bucket এর ফ্রাই আর মেয়নেজ মাস্টারপিস! প্রতিবার খেতে ইচ্ছা করে।" },
   { name: "Anika Tabassum", branch: "Banani Branch", stars: 5, text: "খাবারের টেস্ট একদম স্ট্যান্ডার্ড। সাইট থেকে লোকেশন পেতে কোনো ঝামেলা হয়নি।" },
   { name: "Nayeem Islam", branch: "Mirpur Branch", stars: 5, text: "দ্রুত সার্ভিস আর সুস্বাদু খাবার। চিকেন ফ্রাই ছিল জব।" },
   { name: "Rumana Aktar", branch: "Uttara Branch", stars: 5, text: "খাবারের পরিমাণ অনুযায়ী দাম একদম মানানসই। ভালো লেগেছে।" },
@@ -417,7 +425,7 @@ const reviewsData = [
   { name: "Nusrat Jahan", branch: "Banani Branch", stars: 5, text: "পরিষ্কার এবং স্বাস্থ্যকর খাবার। বারবার খেতে ইচ্ছা করে।" },
   { name: "Touhidul Islam", branch: "Uttara Branch", stars: 5, text: "স্টাফরা খুবই বিনয়ী। খাবার খুব দ্রুতই পেয়ে গেলাম।" },
   { name: "Fahmida Haque", branch: "Dhanmondi Branch", stars: 4, text: "নাস্তার জন্য ভালো জায়গা। তবে ছুটির দিনে ভিড় একটু বেশি থাকে।" },
-  { name: "Mehedi Hasan", branch: "Gulshan Branch", stars: 5, text: "অসাধারণ ফ্রাই এবং ময়নেজ। প্যাকেজিং খুব সুন্দরভাবে করা হয়েছে।" },
+  { name: "Mehedi Hasan", branch: "Gulshan Branch", stars: 5, text: "অসাধারণ ফ্রাই এবং মেয়নেজ। প্যাকেজিং খুব সুন্দরভাবে করা হয়েছে।" },
   { name: "Sumona Akter", branch: "Mohammadpur Branch", stars: 5, text: "Tasty Treat এর স্যান্ডউইচ দারুণ। সকালের জন্য পারফেক্ট।" },
   { name: "Rakibul Islam", branch: "Bashundhara Branch", stars: 5, text: "খাবারের কোয়ালিটি সবসময় মেইনটেইন করা হয়। সেজন্যই এটি আমার প্রিয়।" },
   { name: "Afia Anjum", branch: "Mohakhali Branch", stars: 4, text: "খাবার ঠিকআছে, তবে দাম একটু বেশি।" },
@@ -429,7 +437,9 @@ const reviewsData = [
 
 function renderReviews() {
   const grid = document.getElementById('reviewsGrid');
-  grid.innerHTML = reviewsData.map(r => `
+  const visibleReviews = reviewsData.slice(0, reviewsVisible);
+  
+  grid.innerHTML = visibleReviews.map(r => `
     <div class="review-card">
       <div class="stars">${'⭐'.repeat(r.stars)}</div>
       <p>"${r.text}"</p>
@@ -439,6 +449,18 @@ function renderReviews() {
       </div>
     </div>
   `).join('');
+  
+  const seeMoreBtn = document.getElementById('seeMoreBtn');
+  if (reviewsData.length > reviewsVisible) {
+    seeMoreBtn.style.display = 'inline-block';
+  } else {
+    seeMoreBtn.style.display = 'none';
+  }
+}
+
+function showMoreReviews() {
+  reviewsVisible = reviewsData.length; // Show all remaining reviews
+  renderReviews();
 }
 
 // ---------- Hero Slider Logic ----------
