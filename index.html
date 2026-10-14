@@ -25,7 +25,7 @@
     color:#fff;
     padding:15px 30px;
     box-shadow:0 4px 20px rgba(209,0,0,0.3);
-    position:sticky; /* Sticky to keep buttons on top like ERP */
+    position:sticky;
     top:0;
     z-index:1100;
     overflow:hidden;
@@ -76,6 +76,10 @@
   .outlet-item .addr{font-size:13px;color:#7f8c8d;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
   .outlet-item .addr::before{content:'📍';font-size:14px}
   
+  /* Search Box */
+  .search-box{width:100%;margin-bottom:15px;padding:12px 14px;border:2px solid #e8e8e8;border-radius:8px;font-size:14px;transition:all 0.3s ease;background:#fafbfc}
+  .search-box:focus{border-color:var(--tt-primary);background:#fff;box-shadow:0 0 0 3px rgba(209,0,0,0.1);outline:none}
+
   /* Brand Tags */
   .brand-tag{display:inline-block;font-size:11px;padding:3px 10px;border-radius:15px;font-weight:600;letter-spacing:0.3px}
   .tag-tt{background:linear-gradient(135deg,#ffd9cc,#ffb39c);color:#c0392b} .tag-fb{background:linear-gradient(135deg,#d6e8ff,#a8ccff);color:#1a5276}
@@ -89,6 +93,13 @@
   /* Section Titles */
   .section-title{display:flex;align-items:center;gap:8px;margin-bottom:15px;color:#2c3e50;font-size:17px;font-weight:600}
   .section-title .icon{font-size:20px}
+  
+  /* Official Links */
+  .links-container{display:flex;gap:15px;flex-wrap:wrap;justify-content:center}
+  .link-btn{text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:600;display:flex;align-items:center;gap:8px;transition:all 0.3s ease;color:#fff;font-size:14px}
+  .link-btn.tt{background:linear-gradient(135deg,var(--tt-primary),var(--tt-secondary));box-shadow:0 4px 15px rgba(209,0,0,0.3)}
+  .link-btn.fb{background:linear-gradient(135deg,var(--fb-primary),var(--fb-secondary));box-shadow:0 4px 15px rgba(183,28,28,0.3)}
+  .link-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.3)}
   
   /* Reviews Section */
   .reviews-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:20px;margin-top:20px}
@@ -185,18 +196,11 @@
   <div class="wa-modal-content">
     <button class="wa-close" onclick="closeWaModal()">×</button>
     <h3 style="margin-bottom:15px;color:var(--tt-primary)">📱 WhatsApp মেসেজ করুন</h3>
-    
-    <div class="wa-checklist">
-      ⚠️ মেসেজ পাঠাতে নিচের ৪টি ধাপ অবশ্যই পূরণ করতে হবে।
-    </div>
-
+    <div class="wa-checklist">⚠️ মেসেজ পাঠাতে নিচের ৪টি ধাপ অবশ্যই পূরণ করতে হবে।</div>
     <div class="wa-step">
       <h4>ধাপ ১: আউটলেট নির্বাচন করুন</h4>
-      <select id="wa_outlet" onchange="checkWaSteps()" required>
-        <option value="">-- আউটলেট বাছাই করুন --</option>
-      </select>
+      <select id="wa_outlet" onchange="checkWaSteps()" required><option value="">-- আউটলেট বাছাই করুন --</option></select>
     </div>
-
     <div class="wa-step">
       <h4>ধাপ ২: বিষয় নির্বাচন করুন</h4>
       <select id="wa_topic" onchange="checkWaSteps()" required>
@@ -207,12 +211,10 @@
         <option value="অন্যান্য">অন্যান্য</option>
       </select>
     </div>
-
     <div class="wa-step">
       <h4>ধাপ ৩: আপনার মেসেজ লিখুন</h4>
       <textarea id="wa_msg" rows="4" placeholder="আপনার বার্তা লিখুন..." oninput="checkWaSteps()" required></textarea>
     </div>
-
     <div class="wa-step">
       <h4>ধাপ ৪: শর্ত মেনে চলা</h4>
       <div style="display:flex;align-items:center;gap:10px;background:#f9f9f9;padding:10px;border-radius:8px">
@@ -220,10 +222,16 @@
         <label for="wa_agree" style="margin:0;font-size:12px;color:#555">আমি নিশ্চিত যে প্রদত্ত তথ্য সঠিক এবং এটি একটি সত্যিকারের প্রশ্ন/অভিযোগ।</label>
       </div>
     </div>
+    <button id="wa_send_btn" class="wa-send-btn" onclick="sendWhatsApp()">➡️ WhatsApp এ পাঠান</button>
+  </div>
+</div>
 
-    <button id="wa_send_btn" class="wa-send-btn" onclick="sendWhatsApp()">
-      ➡️ WhatsApp এ পাঠান
-    </button>
+<!-- Public Details Modal -->
+<div class="wa-modal" id="detailsModal">
+  <div class="wa-modal-content">
+    <button class="wa-close" onclick="closeDetailsModal()">×</button>
+    <h3 style="margin-bottom:15px;color:var(--tt-primary)">📱 Outlet Details</h3>
+    <div id="detailsBody"></div>
   </div>
 </div>
 
@@ -264,6 +272,17 @@
 
 <!-- ============ PUBLIC PAGE ============ -->
 <main id="page-public">
+  <!-- Official Links Section -->
+  <div class="card">
+    <div class="section-title"><span class="icon">🔗</span> Official Website & Social Media</div>
+    <div class="links-container">
+      <a href="https://othoba.com/tasty-treat?srsltid=AU7gw4VPOV3QS7UCNwskQQZaBzTKdm-ONyGx8o8W6KlP69Se3VuBR_jo" target="_blank" class="link-btn tt">🛒 Tasty Treat Official Site</a>
+      <a href="https://othoba.com/fry-bucket-brand?srsltid=AU7gw4XrtDW_lQebpah71sJGeUIKQwIU5Lpnmqq4SlXosZ0Q0td-9liG" target="_blank" class="link-btn fb">🛒 Fry Bucket Official Site</a>
+      <a href="https://www.facebook.com/tastytreatbd/" target="_blank" class="link-btn tt">📘 Tasty Treat Facebook</a>
+      <a href="https://www.facebook.com/FryBucket.FastFood/" target="_blank" class="link-btn fb">📘 Fry Bucket Facebook</a>
+    </div>
+  </div>
+
   <div class="card">
     <div class="filter-row">
       <button class="filter-btn active" data-brand="ALL" onclick="setBrand('ALL')">📋 সব Outlets</button>
@@ -273,6 +292,7 @@
     <div class="layout">
       <div>
         <div class="section-title"><span class="icon">📂</span> Outlet List</div>
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 আউটলেট, ঠিকানা বা ফোন নাম্বার দিয়ে সার্চ করুন..." oninput="renderPublic()">
         <div id="outletList" class="outlet-list"><div class="empty">Loading…</div></div>
       </div>
       <div class="map-wrap">
@@ -285,42 +305,18 @@
 
   <!-- Customer Reviews Section -->
   <div class="card">
-    <div class="section-title"><span class="icon">⭐</span> কাস্টমার রিভিউ</div>
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">⭐⭐⭐⭐⭐</div>
-        <p>"Tasty Treat এর চিকেন ফ্রাইড রোস্ট জিনিসটা এক কথায় অসাধারণ! সার্ভিসও খুব দ্রুত।"</p>
-        <div class="reviewer">
-          <div class="avatar">R</div>
-          <div class="reviewer-info"><strong>Rahim Uddin</strong><span>Dhanmondi Branch</span></div>
-        </div>
-      </div>
-      <div class="review-card">
-        <div class="stars">⭐⭐⭐⭐⭐</div>
-        <p>"Fry Bucket এর ক্রিস্পি ফ্রাই আমার বাচ্চাদের খুব পছন্দ। ম্যাপে লোকেশন খুঁজে পাওয়া খুব সহজ হলো এই সাইট থেকে।"</p>
-        <div class="reviewer">
-          <div class="avatar">S</div>
-          <div class="reviewer-info"><strong>Sadia Islam</strong><span>Gulshan Branch</span></div>
-        </div>
-      </div>
-      <div class="review-card">
-        <div class="stars">⭐⭐⭐⭐</div>
-        <p>"খাবারের কোয়ালিটি ভালো, তবে আউটলেটে ভিড় একটু বেশি থাকে। অন্যথায় সব ঠিক আছে।"</p>
-        <div class="reviewer">
-          <div class="avatar">K</div>
-          <div class="reviewer-info"><strong>Karim Ahmed</strong><span>Mirpur Branch</span></div>
-        </div>
-      </div>
-    </div>
+    <div class="section-title"><span class="icon">⭐</span> কাস্টমার রিভিউ (৩০ জনের)</div>
+    <div id="reviewsGrid" class="reviews-grid"></div>
   </div>
 </main>
 
 <!-- ============ ADMIN PAGE ============ -->
 <main id="page-admin" class="hidden">
   <div class="card">
-    <div class="card-title">➕ Manual Add Outlet</div>
+    <div class="card-title" id="formTitle">➕ Manual Add Outlet</div>
     <div class="msg" id="addMsg"></div>
     <form id="addForm" onsubmit="return submitManual(event)">
+      <input type="hidden" id="editRowIndex" value="">
       <div class="row">
         <div style="flex:1">
           <label>🏷️ Brand</label>
@@ -346,7 +342,10 @@
           <select id="m_status"><option value="active">active</option><option value="inactive">inactive</option></select>
         </div>
       </div>
-      <div style="margin-top:15px"><button class="btn btn-primary" type="submit">💾 Save Outlet</button></div>
+      <div style="margin-top:15px; display:flex; gap:10px;">
+        <button class="btn btn-primary" type="submit" id="saveBtn">💾 Save Outlet</button>
+        <button class="btn btn-secondary hidden" type="button" id="cancelEditBtn" onclick="cancelEdit()">✖ Cancel Edit</button>
+      </div>
     </form>
   </div>
 
@@ -388,14 +387,59 @@
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-// ==========================================================
-// ⚙️ আপনার Apps Script Web App URL এখানে বসান
-// ==========================================================
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwAFNbe0cJKY2lJr7zYuR6eVDiTb9bHpM733bJpO-lDXR0jPca7o-eyefx6Ceql45Vy/exec";
-const ADMIN_PASSWORD = "admin123"; // অ্যাডমিন পাসওয়ার্ড
-const WA_NUMBER = "8801704131827"; // WhatsApp নাম্বার (01704131827)
+const ADMIN_PASSWORD = "admin123"; 
+const WA_NUMBER = "8801704131827"; 
 
-let allOutlets = [], renderedItems = [], currentBrand = "ALL", adminUnlocked = false;
+let allOutlets = [], renderedItems = [], currentBrand = "ALL", adminUnlocked = false, adminOutlets = [];
+
+// ---------- 30 Reviews Data ----------
+const reviewsData = [
+  { name: "Rahim Uddin", branch: "Dhanmondi Branch", stars: 5, text: "Tasty Treat এর চিকেন ফ্রাইড রোস্ট জিনিসটা এক কথায় অসাধারণ! সার্ভিসও খুব দ্রুত।" },
+  { name: "Sadia Islam", branch: "Gulshan Branch", stars: 5, text: "Fry Bucket এর ক্রিস্পি ফ্রাই আমার বাচ্চাদের খুব পছন্দ। ম্যাপে লোকেশন খুঁজে পাওয়া খুব সহজ হলো এই সাইট থেকে।" },
+  { name: "Karim Ahmed", branch: "Mirpur Branch", stars: 4, text: "খাবারের কোয়ালিটি ভালো, তবে আউটলেটে ভিড় একটু বেশি থাকে। অন্যথায় সব ঠিক আছে।" },
+  { name: "Nadia Hasan", branch: "Banani Branch", stars: 5, text: "খুবই সুস্বাদু খাবার এবং দ্রুত ডেলিভারি। সবাইকে ট্রাই করতে বলবো।" },
+  { name: "Tanvir Hossain", branch: "Uttara Branch", stars: 5, text: "Fry Bucket এর বার্গার আমার কাছে খুবই পছন্দের। প্যাকেজিংও খুব সুন্দর।" },
+  { name: "Fariha Ahmed", branch: "Mohakhali Branch", stars: 4, text: "খাবারের মান ভালো, তবে দাম একটু বেশি হতে পারে।" },
+  { name: "Sabbir Rahman", branch: "Mirpur Branch", stars: 5, text: "অনলাইনে অর্ডার করেছিলাম, খুব দ্রুত ডেলিভারি পেয়েছি। ধন্যবাদ!" },
+  { name: "Tasnim Khan", branch: "Dhanmondi Branch", stars: 5, text: "Tasty Treat এর পেস্ট্রি আইটেমগুলো দারুণ। সকালের নাস্তার জন্য পারফেক্ট।" },
+  { name: "Imran Kabir", branch: "Bashundhara Branch", stars: 5, text: "স্টাফদের আচরণ খুবই ভালো এবং পরিষ্কার পরিচ্ছন্ন পরিবেশ।" },
+  { name: "Sumaiya Akter", branch: "Gulshan Branch", stars: 4, text: "ফাস্ট ফুড হিসেবে বেশ ভালো। তবে বসার জায়গা আরও বেশি হলে ভালো হয়।" },
+  { name: "Rifat Hossain", branch: "Mohammadpur Branch", stars: 5, text: "Fry Bucket এর ফ্রাই আর ময়নেজ মাস্টারপিস! প্রতিবার খেতে ইচ্ছা করে।" },
+  { name: "Anika Tabassum", branch: "Banani Branch", stars: 5, text: "খাবারের টেস্ট একদম স্ট্যান্ডার্ড। সাইট থেকে লোকেশন পেতে কোনো ঝামেলা হয়নি।" },
+  { name: "Nayeem Islam", branch: "Mirpur Branch", stars: 5, text: "দ্রুত সার্ভিস আর সুস্বাদু খাবার। চিকেন ফ্রাই ছিল জব।" },
+  { name: "Rumana Aktar", branch: "Uttara Branch", stars: 5, text: "খাবারের পরিমাণ অনুযায়ী দাম একদম মানানসই। ভালো লেগেছে।" },
+  { name: "Sajjad Hossain", branch: "Dhanmondi Branch", stars: 4, text: "খাবার ভালো ছিল, তবে অর্ডার নিতে একটু সময় নিয়েছে।" },
+  { name: "Mitu Khanam", branch: "Gulshan Branch", stars: 5, text: "খুবই প্রফেশনাল সার্ভিস। সবাইকে ধন্যবাদ।" },
+  { name: "Hasibul Hasan", branch: "Bashundhara Branch", stars: 5, text: "বার্গারগুলো রসিক এবং জুসি। চাইনিজ আইটেমগুলোও ভালো।" },
+  { name: "Shaila Ahmed", branch: "Mohakhali Branch", stars: 4, text: "একটু দেরি হয়ে ডেলিভারি হলেও খাবারের কোয়ালিটি ভালো ছিল।" },
+  { name: "Arifur Rahman", branch: "Mirpur Branch", stars: 5, text: "Fry Bucket এর চিকেন পপকর্ন একটু অদ্ভুত কিন্তু খুবই সুস্বাদু।" },
+  { name: "Nusrat Jahan", branch: "Banani Branch", stars: 5, text: "পরিষ্কার এবং স্বাস্থ্যকর খাবার। বারবার খেতে ইচ্ছা করে।" },
+  { name: "Touhidul Islam", branch: "Uttara Branch", stars: 5, text: "স্টাফরা খুবই বিনয়ী। খাবার খুব দ্রুতই পেয়ে গেলাম।" },
+  { name: "Fahmida Haque", branch: "Dhanmondi Branch", stars: 4, text: "নাস্তার জন্য ভালো জায়গা। তবে ছুটির দিনে ভিড় একটু বেশি থাকে।" },
+  { name: "Mehedi Hasan", branch: "Gulshan Branch", stars: 5, text: "অসাধারণ ফ্রাই এবং ময়নেজ। প্যাকেজিং খুব সুন্দরভাবে করা হয়েছে।" },
+  { name: "Sumona Akter", branch: "Mohammadpur Branch", stars: 5, text: "Tasty Treat এর স্যান্ডউইচ দারুণ। সকালের জন্য পারফেক্ট।" },
+  { name: "Rakibul Islam", branch: "Bashundhara Branch", stars: 5, text: "খাবারের কোয়ালিটি সবসময় মেইনটেইন করা হয়। সেজন্যই এটি আমার প্রিয়।" },
+  { name: "Afia Anjum", branch: "Mohakhali Branch", stars: 4, text: "খাবার ঠিকআছে, তবে দাম একটু বেশি।" },
+  { name: "Sabbir Ahmed", branch: "Mirpur Branch", stars: 5, text: "ম্যাপ লোকেশন ফিচারটি দারুণ। খুব সহজেই নিকটস্থ আউটলেট বের করা গেল।" },
+  { name: "Lamia Chowdhury", branch: "Banani Branch", stars: 5, text: "ফাস্ট ফুডের জন্য এটি বেস্ট প্লেস। সবাইকে ট্রাই করতে বলবো।" },
+  { name: "Hasan Mahmud", branch: "Uttara Branch", stars: 5, text: "বেস্ট টেস্ট ইন টাউন। প্রায়ই অর্ডার করি।" },
+  { name: "Tania Sultana", branch: "Dhanmondi Branch", stars: 5, text: "খাবারের স্বাদ এবং পরিবেশ দুটোই দারুণ।" }
+];
+
+function renderReviews() {
+  const grid = document.getElementById('reviewsGrid');
+  grid.innerHTML = reviewsData.map(r => `
+    <div class="review-card">
+      <div class="stars">${'⭐'.repeat(r.stars)}</div>
+      <p>"${r.text}"</p>
+      <div class="reviewer">
+        <div class="avatar">${r.name.charAt(0)}</div>
+        <div class="reviewer-info"><strong>${r.name}</strong><span>${r.branch}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
 
 // ---------- Hero Slider Logic ----------
 let currentSlide = 0;
@@ -405,7 +449,7 @@ function nextSlide() {
   currentSlide = (currentSlide + 1) % slides.length;
   slides[currentSlide].classList.add('active');
 }
-setInterval(nextSlide, 4000); // ৪ সেকেন্ড পর পর স্লাইড চেঞ্জ হবে
+setInterval(nextSlide, 4000);
 
 // ---------- Tab Logic ----------
 function showTab(t){
@@ -413,7 +457,6 @@ function showTab(t){
   document.getElementById('tab-admin').classList.toggle('active', t==='admin');
   document.getElementById('page-public').classList.toggle('hidden', t!=='public');
   document.getElementById('page-admin').classList.toggle('hidden', t!=='admin');
-  
   if(t==='admin') loadAdmin();
   if(t==='public') loadPublic();
 }
@@ -422,6 +465,29 @@ function tryAdmin(){
   const pw = prompt('Admin password দিন:');
   if(pw === ADMIN_PASSWORD){ adminUnlocked = true; showTab('admin'); }
   else if(pw !== null){ alert('ভুল পাসওয়ার্ড!'); }
+}
+
+// ---------- Details Modal Logic ----------
+function showDetails(i) {
+  const o = renderedItems[i];
+  if(!o) return;
+  const tag = o.brand==='Tasty Treat' ? 'tag-tt' : 'tag-fb';
+  const phone = o.phone ? `<div class="section-title"><span class="icon">📞</span> Phone Number</div><p style="margin-bottom:15px; font-size:18px; font-weight:600; color:var(--tt-primary)">${escapeHtml(o.phone)}</p>` : '<p style="margin-bottom:15px; color:#999">No phone number available</p>';
+  document.getElementById('detailsBody').innerHTML = `
+    <div style="text-align:center; margin-bottom:20px;">
+      <span class="brand-tag ${tag}" style="font-size:14px; padding:5px 15px;">${escapeHtml(o.brand)}</span>
+      <h2 style="margin-top:10px; color:#2c3e50;">${escapeHtml(o.outletName)}</h2>
+    </div>
+    <div class="section-title"><span class="icon">📍</span> Address</div>
+    <p style="margin-bottom:15px; line-height:1.6; color:#555;">${escapeHtml(o.address)}</p>
+    ${phone}
+    <div class="section-title"><span class="icon">🗺️</span> Location</div>
+    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.outletName + ', ' + o.address)}" target="_blank" class="btn btn-primary" style="width:100%; text-align:center; text-decoration:none; display:block;">Get Directions</a>
+  `;
+  document.getElementById('detailsModal').classList.add('active');
+}
+function closeDetailsModal() {
+  document.getElementById('detailsModal').classList.remove('active');
 }
 
 // ---------- WhatsApp Modal Logic ----------
@@ -448,18 +514,13 @@ function checkWaSteps() {
   const m = document.getElementById('wa_msg').value.trim();
   const a = document.getElementById('wa_agree').checked;
   const btn = document.getElementById('wa_send_btn');
-  
-  if(o && t && m && a) {
-    btn.classList.add('active');
-  } else {
-    btn.classList.remove('active');
-  }
+  if(o && t && m && a) btn.classList.add('active');
+  else btn.classList.remove('active');
 }
 function sendWhatsApp() {
   const o = document.getElementById('wa_outlet').value;
   const t = document.getElementById('wa_topic').value;
   const m = document.getElementById('wa_msg').value.trim();
-  
   const text = `আউটলেট: ${o}%0Aবিষয়: ${t}%0Aবার্তা: ${m}`;
   const url = `https://wa.me/${WA_NUMBER}?text=${text}`;
   window.open(url, '_blank');
@@ -507,9 +568,22 @@ function setBrand(b){
 }
 function renderPublic(){
   const list = document.getElementById('outletList');
+  const searchTerm = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  
   let items = allOutlets;
   if(currentBrand!=='ALL') items = items.filter(o=>o.brand===currentBrand);
-  renderedItems = items;
+  
+  if(searchTerm) {
+    items = items.filter(o => 
+      (o.outletName && o.outletName.toLowerCase().includes(searchTerm)) ||
+      (o.address && o.address.toLowerCase().includes(searchTerm)) ||
+      (o.phone && o.phone.toLowerCase().includes(searchTerm)) ||
+      (o.brand && o.brand.toLowerCase().includes(searchTerm))
+    );
+  }
+  
+  renderedItems = items; // Update renderedItems to match filtered items for map selection
+  
   if(!items.length){ 
     list.innerHTML='<div class="empty">কোনো outlet পাওয়া যায়নি</div>'; 
     return; 
@@ -519,8 +593,16 @@ function renderPublic(){
     return `<div class="outlet-item" onclick="selectOutlet(${i})">
       <div class="name">${escapeHtml(o.outletName)} <span class="brand-tag ${tag}">${o.brand}</span></div>
       <div class="addr">${escapeHtml(o.address)}</div>
+      <div style="text-align:right; margin-top:8px;">
+        <button class="btn btn-primary" style="padding:4px 10px; font-size:12px;" onclick="event.stopPropagation(); showDetails(${i})">👁️ View Details</button>
+      </div>
     </div>`;
   }).join('');
+  
+  // Optional: Auto-select the first result if searching
+  if(items.length > 0 && searchTerm) {
+    selectOutlet(0);
+  }
 }
 function selectOutlet(i){
   const o = renderedItems[i]; if(!o) return;
@@ -538,13 +620,13 @@ async function loadAdmin(){
     const res = await jsonpGet({action:'list'});
     const table = document.getElementById('adminTable');
     const rows = res.outlets||[];
+    adminOutlets = rows;
     if(!rows.length){ table.innerHTML='<tr><td colspan="7" class="empty">কোনো outlet এখনো যোগ করা হয়নি</td></tr>'; return; }
     table.innerHTML = rows.map((o,i)=>{
       const status = (o.status||'active').toLowerCase();
       let statusClass = 'status-other';
       if(status==='active' || status==='y' || status==='yes' || status==='1' || status==='true') statusClass='status-active';
       else if(status==='inactive' || status==='n' || status==='no' || status==='0') statusClass='status-inactive';
-      
       return `<tr>
         <td><strong>${i+1}</strong></td>
         <td><span class="brand-tag ${o.brand==='Tasty Treat' ? 'tag-tt' : 'tag-fb'}">${escapeHtml(o.brand)}</span></td>
@@ -552,13 +634,44 @@ async function loadAdmin(){
         <td>${escapeHtml(o.address)}</td>
         <td>${escapeHtml(o.phone||'')}</td>
         <td><span class="${statusClass}">${escapeHtml(o.status||'')}</span></td>
-        <td><button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="delOutlet(${o.rowIndex})">✕</button></td>
+        <td>
+          <div style="display:flex; gap:5px;">
+            <button class="btn btn-primary" style="padding:6px 12px;font-size:12px" onclick="editOutlet(${i})">✏️</button>
+            <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="delOutlet(${o.rowIndex})">🗑️</button>
+          </div>
+        </td>
       </tr>`;
     }).join('');
   }catch(e){ document.getElementById('adminTable').innerHTML='<tr><td colspan="7" class="empty">⚠️ লোড ব্যর্থ</td></tr>'; }
 }
+function editOutlet(idx){
+  const o = adminOutlets[idx];
+  if(!o) return;
+  document.getElementById('editRowIndex').value = o.rowIndex;
+  document.getElementById('m_brand').value = o.brand;
+  document.getElementById('m_name').value = o.outletName;
+  document.getElementById('m_addr').value = o.address;
+  document.getElementById('m_phone').value = o.phone || '';
+  let statusVal = 'active';
+  const s = (o.status||'active').toLowerCase();
+  if(s==='inactive' || s==='n' || s==='no' || s==='0') statusVal = 'inactive';
+  document.getElementById('m_status').value = statusVal;
+  
+  document.getElementById('saveBtn').textContent = '🔄 Update Outlet';
+  document.getElementById('cancelEditBtn').classList.remove('hidden');
+  document.getElementById('formTitle').textContent = '✏️ Edit Outlet';
+  document.getElementById('addForm').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+function cancelEdit(){
+  document.getElementById('addForm').reset();
+  document.getElementById('editRowIndex').value = '';
+  document.getElementById('saveBtn').textContent = '💾 Save Outlet';
+  document.getElementById('cancelEditBtn').classList.add('hidden');
+  document.getElementById('formTitle').textContent = '➕ Manual Add Outlet';
+}
 async function submitManual(e){
   e.preventDefault();
+  const rowIndex = document.getElementById('editRowIndex').value;
   const outlet = {
     brand: document.getElementById('m_brand').value,
     outletName: document.getElementById('m_name').value.trim(),
@@ -566,17 +679,31 @@ async function submitManual(e){
     phone: document.getElementById('m_phone').value.trim(),
     status: document.getElementById('m_status').value
   };
-  showMsg('addMsg','Saving…','');
-  try{
-    const res = await postJSON({action:'add', rows:[outlet]});
-    if(res.ok){ 
-      showMsg('addMsg', `✅ "${outlet.outletName}" যোগ হয়েছে!`, 'ok'); 
-      document.getElementById('addForm').reset(); 
-      loadAdmin();
-      loadPublic();
-    }
-    else throw new Error(res.error||'Failed');
-  }catch(err){ showMsg('addMsg','❌ সেভ ব্যর্থ: '+err.message,'err'); }
+  
+  if(rowIndex) {
+    showMsg('addMsg','Updating…','');
+    try{
+      const res = await postJSON({action:'update', row:rowIndex, ...outlet});
+      if(res.ok){ 
+        showMsg('addMsg', `✅ "${outlet.outletName}" আপডেট হয়েছে!`, 'ok'); 
+        cancelEdit();
+        loadAdmin();
+        loadPublic();
+      } else throw new Error(res.error||'Failed');
+    }catch(err){ showMsg('addMsg','❌ আপডেট ব্যর্থ: '+err.message,'err'); }
+  } else {
+    showMsg('addMsg','Saving…','');
+    try{
+      const res = await postJSON({action:'add', rows:[outlet]});
+      if(res.ok){ 
+        showMsg('addMsg', `✅ "${outlet.outletName}" যোগ হয়েছে!`, 'ok'); 
+        document.getElementById('addForm').reset(); 
+        loadAdmin();
+        loadPublic();
+      }
+      else throw new Error(res.error||'Failed');
+    }catch(err){ showMsg('addMsg','❌ সেভ ব্যর্থ: '+err.message,'err'); }
+  }
   return false;
 }
 async function delOutlet(row){
@@ -605,7 +732,6 @@ function showMsg(id,text,cls){
 async function handleFile(e, brand){
   const file = e.target.files[0]; if(!file) return;
   const msgId = brand === 'Tasty Treat' ? 'uploadMsgTT' : 'uploadMsgFB';
-  
   showMsg(msgId,'ফাইল পড়া হচ্ছে…','');
   try{
     const buf = await file.arrayBuffer();
@@ -613,7 +739,6 @@ async function handleFile(e, brand){
     const ws = wb.Sheets[wb.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(ws,{defval:''});
     const findKey = (obj,keys)=>{ for(const k of keys){ for(const rk of Object.keys(obj)){ if(rk.toLowerCase().trim()===k.toLowerCase()) return String(obj[rk]).trim(); } } return ''; };
-    
     const mapped = rows.map(r=>({
       brand: brand, 
       outletName: findKey(r,['outletName','Outlet Name','OutletName','name','Name']),
@@ -621,10 +746,8 @@ async function handleFile(e, brand){
       phone: findKey(r,['phone','Phone']),
       status: findKey(r,['status','Status']) || 'active'
     })).filter(o=>o.outletName && o.address);
-    
     if(!mapped.length){ showMsg(msgId,'⚠️ কোনো ভ্যালিড রো পাওয়া যায়নি। হেডার ঠিক আছে কিনা দেখুন।','err'); return; }
     showMsg(msgId,`${mapped.length} টি ${brand} outlet পাঠানো হচ্ছে…`,'');
-    
     const res = await postJSON({action:'add', rows:mapped});
     if(res.ok){ 
       showMsg(msgId,`✅ ${res.added} টি ${brand} outlet যোগ হয়েছে!`,'ok'); 
@@ -647,6 +770,8 @@ function downloadTemplate(brand){
   XLSX.writeFile(wb, `${brand.replace(/\s/g,'_')}_template.xlsx`);
 }
 
+// ---------- Init ----------
+renderReviews();
 loadPublic();
 </script>
 </body>
